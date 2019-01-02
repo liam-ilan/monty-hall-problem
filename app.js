@@ -49,6 +49,7 @@ app.use(bodyParser.json())
 // save the public directory
 app.use(express.static('public'))
 
+// mockup data
 let games = []
 
 // this function chooses a random door using the built in node.js random number generator
