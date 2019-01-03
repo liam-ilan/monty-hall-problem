@@ -72,6 +72,7 @@ function eliminateDoor (userChoice, prizePosition) {
   return possible[Math.floor(Math.random() * possible.length)]
 }
 
+// make a new game
 app.post('/v1/game/new', function (req, res) {
   let game = {}
 
@@ -93,9 +94,26 @@ app.post('/v1/game/new', function (req, res) {
   console.log(games)
 })
 
+// make a choice
 app.put('/v1/game/choice', function (req, res) {
   // a mock of finding the game in the db
+
   let game = games.find(item => item._id === req.body._id)
+
+  // ignore request if properties were already created
+
+  if (game.hasOwnProperty('choice_at')) return null
+  if (game.hasOwnProperty('initial_choice')) return null
+  if (game.hasOwnProperty('eliminated_door')) return null
+
+  // ignore request if the game has not been made yet
+
+  if (!game.hasOwnProperty('_id')) return null
+  if (!game.hasOwnProperty('position_of_prize')) return null
+  if (!game.hasOwnProperty('created_at')) return null
+
+  // ignore request if the users choice is not a number between 0 and 2
+  if (!(req.body.choice > -1 && req.body.choice < 3)) return null
 
   // the time the user makes the choice in milliseconds since January 1, 1970, 00:00:00 UTC
   game.choice_at = Date.now()
@@ -119,13 +137,43 @@ app.put('/v1/game/choice', function (req, res) {
   res.json({ eliminated_door: game.eliminated_door })
 })
 
+// change your choice
 app.put('/v1/game/switch', function (req, res) {
   // a mock of finding the game in the db
   let game = games.find(item => item._id === req.body._id)
 
+  // ignore request if properties were already created
+
+  if (game.hasOwnProperty('switch_at')) return null
+  if (game.hasOwnProperty('final_choice')) return null
+  if (game.hasOwnProperty('win')) return null
+  if (game.hasOwnProperty('switched')) return null
+
+  // ignore request if the game has not been made yet
+
+  if (!game.hasOwnProperty('_id')) return null
+  if (!game.hasOwnProperty('position_of_prize')) return null
+  if (!game.hasOwnProperty('created_at')) return null
+
+  // ignore request if the choice has not been made yet
+
+  if (!game.hasOwnProperty('choice_at')) return null
+  if (!game.hasOwnProperty('initial_choice')) return null
+  if (!game.hasOwnProperty('eliminated_door')) return null
+
+  // ignore request if the final choice is equal to the eliminated door
+  if (req.body.final_choice === game.eliminated_door) return null
+
+  // time the user's choice was switched
   game.switch_at = Date.now()
+
+  // the users final choice
   game.final_choice = req.body.final_choice
+
+  // if the user won
   game.win = game.final_choice === game.position_of_prize
+
+  // did the user switch
   game.switched = game.final_choice === game.initial_choice
 
   console.log(game)

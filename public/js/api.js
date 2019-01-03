@@ -22,16 +22,15 @@ api.reqJson = async function (url, method = 'GET', data = null) {
   return json
 }
 
-
 // new game
 // gets callback
 // posts game to server
 // runs callback and passes _id
 
-api.newGame = async function(cb){
-  const _id = await api.reqJson('/v1/game/new', 'post');
+api.newGame = async function (cb) {
+  const _id = await api.reqJson('/v1/game/new', 'post')
   // cb
-  return cb ? cb(_id) : null;
+  return cb ? cb(_id) : null
 }
 
 // make a choice
@@ -39,17 +38,16 @@ api.newGame = async function(cb){
 // posts choice and game _id to server, and gets back eliminated door
 // runs callback and passes the eliminated door
 
-api.makeChoice = async function(_id, choice, cb){
-
+api.makeChoice = async function (_id, choice, cb) {
   // options to pass to server
   let options = {
     _id: _id,
     choice: choice
   }
 
-  const eliminated = await api.reqJson('/v1/game/choice', 'put', options);
+  const eliminated = await api.reqJson('/v1/game/choice', 'put', options)
   // cb
-  return cb ? cb(eliminated) : null;
+  return cb ? cb(eliminated) : null
 }
 
 // change your choice
@@ -57,15 +55,14 @@ api.makeChoice = async function(_id, choice, cb){
 // posts final_choice and game _id to server, and gets back the final results
 // runs callback and passes the final results
 
-api.changeChoice = async function(final_choice, _id, cb){
-
+api.changeChoice = async function (finalChoice, _id, cb) {
   // options to pass to server
   let options = {
-    final_choice: final_choice,
+    final_choice: finalChoice,
     _id: _id
   }
 
-  const final = await api.reqJson('/v1/game/switch', 'put', options);
+  const final = await api.reqJson('/v1/game/switch', 'put', options)
   // cb
-  return cb ? cb(final) : null;
+  return cb ? cb(final) : null
 }
