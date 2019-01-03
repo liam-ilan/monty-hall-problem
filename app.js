@@ -85,6 +85,10 @@ app.post('/v1/game/new', function (req, res) {
   // position of the prize
   game.position_of_prize = chooseRandomDoor()
 
+  // the game is not completed
+  // this value is set to true when the game is finished
+  game.completed = false
+
   // push the game into the Database
   games.push(game)
 
@@ -97,23 +101,21 @@ app.post('/v1/game/new', function (req, res) {
 // make a choice
 app.put('/v1/game/choice', function (req, res) {
   // a mock of finding the game in the db
-
   let game = games.find(item => item._id === req.body._id)
 
-  // ignore request if properties were already created
-
-  if (game.hasOwnProperty('choice_at')) return null
-  if (game.hasOwnProperty('initial_choice')) return null
-  if (game.hasOwnProperty('eliminated_door')) return null
-
   // ignore request if the game has not been made yet
+  if (!game) return res.json({ error: 'error' })
 
-  if (!game.hasOwnProperty('_id')) return null
-  if (!game.hasOwnProperty('position_of_prize')) return null
-  if (!game.hasOwnProperty('created_at')) return null
+  // ignore request if properties were already created
+  if (game.hasOwnProperty('choice_at')) return res.json({ error: 'error' })
+  if (game.hasOwnProperty('initial_choice')) return res.json({ error: 'error' })
+  if (game.hasOwnProperty('eliminated_door')) return res.json({ error: 'error' })
+
+  // ignore request if the choice is not a number
+  if (req.body.choice !== parseInt(req.body.choice, 10)) return res.json({ error: 'error' })
 
   // ignore request if the users choice is not a number between 0 and 2
-  if (!(req.body.choice > -1 && req.body.choice < 3)) return null
+  if (!(req.body.choice > -1 && req.body.choice < 3)) return res.json({ error: 'error' })
 
   // the time the user makes the choice in milliseconds since January 1, 1970, 00:00:00 UTC
   game.choice_at = Date.now()
@@ -142,27 +144,28 @@ app.put('/v1/game/switch', function (req, res) {
   // a mock of finding the game in the db
   let game = games.find(item => item._id === req.body._id)
 
-  // ignore request if properties were already created
-
-  if (game.hasOwnProperty('switch_at')) return null
-  if (game.hasOwnProperty('final_choice')) return null
-  if (game.hasOwnProperty('win')) return null
-  if (game.hasOwnProperty('switched')) return null
-
   // ignore request if the game has not been made yet
+  if (!game) return res.json({ error: 'error' })
 
-  if (!game.hasOwnProperty('_id')) return null
-  if (!game.hasOwnProperty('position_of_prize')) return null
-  if (!game.hasOwnProperty('created_at')) return null
+  // ignore request if properties were already created
+  if (game.hasOwnProperty('switch_at')) return res.json({ error: 'error' })
+  if (game.hasOwnProperty('final_choice')) return res.json({ error: 'error' })
+  if (game.hasOwnProperty('win')) return res.json({ error: 'error' })
+  if (game.hasOwnProperty('switched')) return res.json({ error: 'error' })
 
   // ignore request if the choice has not been made yet
+  if (!game.hasOwnProperty('choice_at')) return res.json({ error: 'error' })
+  if (!game.hasOwnProperty('initial_choice')) return res.json({ error: 'error' })
+  if (!game.hasOwnProperty('eliminated_door')) return res.json({ error: 'error' })
 
-  if (!game.hasOwnProperty('choice_at')) return null
-  if (!game.hasOwnProperty('initial_choice')) return null
-  if (!game.hasOwnProperty('eliminated_door')) return null
+  // ignore request if the final choice is not a number
+  if (req.body.final_choice !== parseInt(req.body.final_choice, 10)) return res.json({ error: 'error' })// console.log(req.body.final_choice, req.body.final_choice, req.body.final_choice !== parseInt(req.body.final_choice, 10))
 
   // ignore request if the final choice is equal to the eliminated door
-  if (req.body.final_choice === game.eliminated_door) return null
+  if (req.body.final_choice === game.eliminated_door) return res.json({ error: 'error' })
+
+  // ignore request if the users final choice is not a number between 0 and 2
+  if (!(req.body.final_choice > -1 && req.body.final_choice < 3)) return res.json({ error: 'error' })
 
   // time the user's choice was switched
   game.switch_at = Date.now()
@@ -175,6 +178,16 @@ app.put('/v1/game/switch', function (req, res) {
 
   // did the user switch
   game.switched = game.final_choice === game.initial_choice
+
+  // the game is finished
+  game.completed = true
+
+  // a mock of finding the game in the database, and THEN replacing it with our new game
+  games.forEach(function (item, i) {
+    if (item._id === game._id) {
+      games[i] = game
+    }
+  })
 
   console.log(game)
 
