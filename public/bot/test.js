@@ -38,10 +38,8 @@ function runGame () {
   })
 }
 
-function loopGames(amount){
+function loopGames (amount) {
   for (let i = 0; i < amount; i++) {
     runGame()
   };
 }
-
-
