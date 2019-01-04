@@ -37,7 +37,7 @@ let db
 // connect to the DB
 MongoClient.connect(mongoURI, mongoOptions, (err, client) => {
   // if there is an error, log it
-  if (err) return console.log(err)
+  if (err) return console.log({ fail: 'database error' })
 
   // set the DB
   db = client.db('heroku_qrw26v0v')
@@ -55,18 +55,12 @@ app.use(bodyParser.json())
 // save the public directory
 app.use(express.static('public'))
 
-// mockup data
-let games = []
-
 // make a new game
 app.post('/v1/game/new', function (req, res) {
   let game = {}
 
   // the time the experiment was created in milliseconds since January 1, 1970, 00:00:00 UTC
   game.created_at = Date.now()
-
-  // id of experiment
-  game._id = Math.random()
 
   // position of the prize
   game.position_of_prize = gameMechanics.chooseRandomDoor()
@@ -75,72 +69,73 @@ app.post('/v1/game/new', function (req, res) {
   // this value is set to true when the game is finished
   game.completed = false
 
-  // push the game into the Database
-  games.push(game)
+  db.collection('games').insertOne(game, function (err, result) {
+    if (err) return res.json({ fail: 'database error' })
+  })
 
   // ONLY return _id
   res.json({ _id: game._id })
-
-  console.log(games)
 })
 
 // make a choice
 app.put('/v1/game/choice', function (req, res) {
-  // a mock of finding the game in the db
-  let game = games.find(item => item._id === req.body._id)
+  // find the game based on it's _id
+  db.collection('games').findOne({ '_id': ObjectId(req.body._id) }, function (err, game) {
+    if (err) return res.json({ fail: 'database error' })
 
-  // validate this route
-  if (!inputValidation.choice(game, req.body)) { res.json({ fail: 'invalid input / corrupt game' }) }
+    // validate this route
+    if (!inputValidation.choice(game, req.body)) { return res.json({ fail: 'invalid input / corrupt game' }) }
 
-  // the time the user makes the choice in milliseconds since January 1, 1970, 00:00:00 UTC
-  game.choice_at = Date.now()
+    // the time the user makes the choice in milliseconds since January 1, 1970, 00:00:00 UTC
+    game.choice_at = Date.now()
 
-  // the user's choice of doors
-  game.initial_choice = req.body.choice
+    // the user's choice of doors
+    game.initial_choice = req.body.choice
 
-  // the door we eliminate
-  game.eliminated_door = gameMechanics.eliminateDoor(game.initial_choice, game.position_of_prize)
+    // the door we eliminate
+    game.eliminated_door = gameMechanics.eliminateDoor(game.initial_choice, game.position_of_prize)
 
-  // a mock of finding the game in the database, and THEN replacing it with our new game
-  games.forEach(function (item, i) {
-    if (item._id === game._id) {
-      games[i] = game
-    }
+    delete game._id
+
+    // find the game based on it's _id, and then update it with our new, updated game
+    db.collection('games').findOneAndUpdate({ '_id': ObjectId(req.body._id) }, { $set: game }, { returnOriginal: false }, function (err, result) {
+      if (err) return res.json({ fail: 'database error' })
+
+      // ONLY return eliminated door
+      res.json({ eliminated_door: result.value.eliminated_door })
+    })
   })
-
-  // ONLY return eliminated door
-  res.json({ eliminated_door: game.eliminated_door })
 })
 
 // change your choice
 app.put('/v1/game/switch', function (req, res) {
   // a mock of finding the game in the db
-  let game = games.find(item => item._id === req.body._id)
+  db.collection('games').findOne({ '_id': ObjectId(req.body._id) }, function (err, game) {
+    if (err) return res.json({ fail: 'database error' })
 
-  // validate this route
-  if (!inputValidation.switch(game, req.body)) { res.json({ fail: 'invalid input / corrupt game' }) }
+    // validate this route
+    if (!inputValidation.switch(game, req.body)) { return res.json({ fail: 'invalid input / corrupt game' }) }
 
-  // time the user's choice was switched
-  game.switch_at = Date.now()
+    // time the user's choice was switched
+    game.switch_at = Date.now()
 
-  // the users final choice
-  game.final_choice = req.body.final_choice
+    // the users final choice
+    game.final_choice = req.body.final_choice
 
-  // if the user won
-  game.win = game.final_choice === game.position_of_prize
+    // if the user won
+    game.win = game.final_choice === game.position_of_prize
 
-  // did the user switch
-  game.switched = game.final_choice === game.initial_choice
+    // did the user switch
+    game.switched = game.final_choice === game.initial_choice
 
-  // the game is finished
-  game.completed = true
+    // the game is finished
+    game.completed = true
 
-  // a mock of finding the game in the database, and THEN replacing it with our new game
-  games.forEach(function (item, i) {
-    if (item._id === game._id) {
-      games[i] = game
-    }
+    delete game._id
+    // a mock of finding the game in the database, and THEN replacing it with our new game
+    db.collection('games').findOneAndUpdate({ '_id': ObjectId(req.body._id) }, { $set: game }, { returnOriginal: false }, function (err, result) {
+      if (err) return res.json({ fail: 'database error' })
+      res.json({ position_of_prize: result.value.position_of_prize, win: result.value.win })
+    })
   })
-
-  res.json({ position_of_prize: game.position_of_prize, win: game.win })
 })
