@@ -126,7 +126,7 @@ app.put('/v1/game/switch', function (req, res) {
     game.win = game.final_choice === game.position_of_prize
 
     // did the user switch
-    game.switched = game.final_choice === game.initial_choice
+    game.switched = game.final_choice !== game.initial_choice
 
     // the game is finished
     game.completed = true
