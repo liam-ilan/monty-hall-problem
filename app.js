@@ -139,3 +139,14 @@ app.put('/v1/game/switch', function (req, res) {
     })
   })
 })
+
+// get data depending on a mongo query sent by the user
+app.post('/v1/game/count', function (req, res) {
+  // count all documents in 'games' matching the query given
+  db.collection('games').countDocuments(req.body.query, function (err, count) {
+    if (err) return res.json({ fail: 'database error' })
+
+    // return the count
+    res.json({ count: count })
+  })
+})

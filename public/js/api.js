@@ -29,6 +29,7 @@ api.reqJson = async function (url, method = 'GET', data = null) {
 
 api.newGame = async function (cb) {
   const _id = await api.reqJson('/v1/game/new', 'post')
+
   // cb
   return cb ? cb(_id) : null
 }
@@ -46,6 +47,7 @@ api.makeChoice = async function (_id, choice, cb) {
   }
 
   const eliminated = await api.reqJson('/v1/game/choice', 'put', options)
+
   // cb
   return cb ? cb(eliminated) : null
 }
@@ -63,6 +65,24 @@ api.changeChoice = async function (finalChoice, _id, cb) {
   }
 
   const final = await api.reqJson('/v1/game/switch', 'put', options)
+
   // cb
   return cb ? cb(final) : null
+}
+
+// count data
+// gets query
+// posts query to server, and gets back the count
+// runs callback and passes the count
+
+api.count = async function (query, cb) {
+  // options to pass to server
+  let options = {
+    query: query
+  }
+
+  const count = await api.reqJson('/v1/game/count', 'post', options)
+
+  // cb
+  return cb ? cb(count) : null
 }
