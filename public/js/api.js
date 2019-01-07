@@ -70,19 +70,16 @@ api.changeChoice = async function (finalChoice, _id, cb) {
   return cb ? cb(final) : null
 }
 
-// count data
+
+// get results
 // gets query
 // posts query to server, and gets back the count
 // runs callback and passes the count
 
-api.count = async function (query, cb) {
-  // options to pass to server
-  let options = {
-    query: query
-  }
+api.results = async function (cb) {
 
-  const count = await api.reqJson('/v1/game/count', 'post', options)
+  const results = await api.reqJson('/v1/game/results', 'get')
 
   // cb
-  return cb ? cb(count) : null
+  return cb ? cb(results) : null
 }

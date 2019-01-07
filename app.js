@@ -140,13 +140,52 @@ app.put('/v1/game/switch', function (req, res) {
   })
 })
 
-// get data depending on a mongo query sent by the user
-app.post('/v1/game/count', function (req, res) {
-  // count all documents in 'games' matching the query given
-  db.collection('games').countDocuments(req.body.query, function (err, count) {
-    if (err) return res.json({ fail: 'database error' })
+// get results
+app.get('/v1/game/results', function (req, res) {
 
-    // return the count
-    res.json({ count: count })
+  // queries
+  let allGamesQuery = {completed: {$eq: true}}
+
+  let switchedGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: true}}]}
+  let switchedWinGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: true}}, {win: {$eq: true}}]}
+
+  let notSwitchedGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: false}}]}
+  let notSwitchedWinGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: false}}, {win: {$eq: true}}]}
+
+  // numbers to return
+  let numbers = {}
+
+  // welcome to callback hell
+  db.collection('games').countDocuments(allGamesQuery, function (err, allGames) {
+    if (err) return res.json({ fail: 'database error' })
+    numbers.all_games = allGames
+
+    db.collection('games').countDocuments(switchedGamesQuery, function (err, switchedGames) {
+      if (err) return res.json({ fail: 'database error' })
+      numbers.switched_games = switchedGames
+
+      db.collection('games').countDocuments(switchedWinGamesQuery, function (err, switchedWinGames) {
+        if (err) return res.json({ fail: 'database error' })
+        numbers.switched_win_games = switchedWinGames
+
+        db.collection('games').countDocuments(notSwitchedGamesQuery, function (err, notSwitchedGames) {
+          if (err) return res.json({ fail: 'database error' })
+          numbers.not_switched_games = notSwitchedGames
+
+          db.collection('games').countDocuments(notSwitchedWinGamesQuery, function (err, notSwitchedWinGames) {
+            if (err) return res.json({ fail: 'database error' })
+            numbers.not_switched_win_games = notSwitchedWinGames
+
+            res.json(numbers)
+          })
+
+        })
+
+      })
+
+    })
+
   })
+
 })
+
