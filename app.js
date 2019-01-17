@@ -145,50 +145,45 @@ app.put('/v1/game/switch', function (req, res) {
 
 // get results
 app.get('/v1/game/results', function (req, res) {
-
   // queries
-  let allGamesQuery = {completed: {$eq: true}}
+  let botQuery = { bot: { $eq: false } }
 
-  let switchedGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: true}}]}
-  let switchedWinGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: true}}, {win: {$eq: true}}]}
+  let allGamesQuery = { completed: { $eq: true } }
 
-  let notSwitchedGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: false}}]}
-  let notSwitchedWinGamesQuery = {$and: [{completed: {$eq: true}}, {switched: {$eq: false}}, {win: {$eq: true}}]}
+  let switchedGamesQuery = { $and: [{ completed: { $eq: true } }, { switched: { $eq: true } }] }
+  let switchedWinGamesQuery = { $and: [{ completed: { $eq: true } }, { switched: { $eq: true } }, { win: { $eq: true } }] }
+
+  let notSwitchedGamesQuery = { $and: [{ completed: { $eq: true } }, { switched: { $eq: false } }] }
+  let notSwitchedWinGamesQuery = { $and: [{ completed: { $eq: true } }, { switched: { $eq: false } }, { win: { $eq: true } }] }
 
   // numbers to return
   let numbers = {}
 
   // welcome to callback hell
-  db.collection('games').countDocuments(allGamesQuery, function (err, allGames) {
+  db.collection('games').countDocuments({ $and: [allGamesQuery, botQuery] }, function (err, allGames) {
     if (err) return res.json({ fail: 'database error' })
     numbers.all_games = allGames
 
-    db.collection('games').countDocuments(switchedGamesQuery, function (err, switchedGames) {
+    db.collection('games').countDocuments({ $and: [switchedGamesQuery, botQuery] }, function (err, switchedGames) {
       if (err) return res.json({ fail: 'database error' })
       numbers.switched_games = switchedGames
 
-      db.collection('games').countDocuments(switchedWinGamesQuery, function (err, switchedWinGames) {
+      db.collection('games').countDocuments({ $and: [switchedWinGamesQuery, botQuery] }, function (err, switchedWinGames) {
         if (err) return res.json({ fail: 'database error' })
         numbers.switched_win_games = switchedWinGames
 
-        db.collection('games').countDocuments(notSwitchedGamesQuery, function (err, notSwitchedGames) {
+        db.collection('games').countDocuments({ $and: [notSwitchedGamesQuery, botQuery] }, function (err, notSwitchedGames) {
           if (err) return res.json({ fail: 'database error' })
           numbers.not_switched_games = notSwitchedGames
 
-          db.collection('games').countDocuments(notSwitchedWinGamesQuery, function (err, notSwitchedWinGames) {
+          db.collection('games').countDocuments({ $and: [notSwitchedWinGamesQuery, botQuery] }, function (err, notSwitchedWinGames) {
             if (err) return res.json({ fail: 'database error' })
             numbers.not_switched_win_games = notSwitchedWinGames
 
             res.json(numbers)
           })
-
         })
-
       })
-
     })
-
   })
-
 })
-
