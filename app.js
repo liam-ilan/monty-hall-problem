@@ -69,6 +69,9 @@ app.post('/v1/game/new', function (req, res) {
   // this value is set to true when the game is finished
   game.completed = false
 
+  // is the game a bot (non-verifiable)
+  game.bot = req.body.bot
+
   db.collection('games').insertOne(game, function (err, result) {
     if (err) return res.json({ fail: 'database error' })
   })
