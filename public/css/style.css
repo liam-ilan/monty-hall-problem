@@ -1,0 +1,20 @@
+.button{
+  border: 5px solid black;
+  text-align: center;
+  font-size: 70px
+}
+
+.title{
+  text-align: center;
+  font-size: 60px
+}
+
+.text{
+  text-align: center;
+  font-size: 20px;
+
+}
+
+table{
+  font-size: 25px
+}

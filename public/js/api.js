@@ -28,7 +28,7 @@ api.reqJson = async function (url, method = 'GET', data = null) {
 // runs callback and passes _id
 
 api.newGame = async function (isBot, cb) {
-  const _id = await api.reqJson('/v1/game/new', 'post', {bot: isBot})
+  const _id = await api.reqJson('/v1/game/new', 'post', { bot: isBot })
 
   // cb
   return cb ? cb(_id) : null
@@ -40,14 +40,12 @@ api.newGame = async function (isBot, cb) {
 // runs callback and passes the eliminated door
 
 api.makeChoice = async function (_id, choice, cb) {
-
-
   // options to pass to server
   let options = {
     _id: _id,
     choice: choice
   }
-  
+
   const eliminated = await api.reqJson('/v1/game/choice', 'put', options)
 
   // cb
@@ -72,14 +70,12 @@ api.changeChoice = async function (finalChoice, _id, cb) {
   return cb ? cb(final) : null
 }
 
-
 // get results
 // gets query
 // posts query to server, and gets back the count
 // runs callback and passes the count
 
 api.results = async function (cb) {
-
   const results = await api.reqJson('/v1/game/results', 'get')
 
   // cb
