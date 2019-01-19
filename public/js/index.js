@@ -1,4 +1,9 @@
 /* global blockLike api */
+
+// current game
+let game = {}
+
+let canClick = true
 // list of games
 let games = JSON.parse(window.localStorage.getItem('games'))
 
@@ -43,14 +48,11 @@ function myResults () {
   return res
 }
 
-// current game
-let game = {}
-
 // screen number
 let screenNumber = 0
 
 // stage
-let stage = new blockLike.Stage({ width: 800, height: 600 })
+let stage = new blockLike.Stage()
 
 stage.css('border', '10px solid black')
 
@@ -105,7 +107,7 @@ let nextButton = new blockLike.Sprite({
 })
 nextButton.addClass('button')
 nextButton.addTo(stage)
-nextButton.inner(`next`)
+nextButton.inner(`Next`)
 nextButton.hide()
 
 // continue button
@@ -121,6 +123,20 @@ continueButton.addTo(stage)
 continueButton.inner(`Continue`)
 continueButton.hide()
 continueButton.goTo(0, -200)
+
+// play again
+let playAgainButton = new blockLike.Sprite({
+  costume: new blockLike.Costume({
+    color: '#FC6A21',
+    width: 300,
+    height: 180
+  })
+})
+playAgainButton.addClass('button')
+playAgainButton.addTo(stage)
+playAgainButton.inner(`Play Again`)
+playAgainButton.hide()
+playAgainButton.goTo(0, -150)
 
 // yes button (for switch)
 let yes = new blockLike.Sprite({
@@ -302,6 +318,10 @@ function hideAll () {
 
 stage.whenReceiveMessage('screen1', function () {
   screenNumber = 1
+  api.newGame(false, function (res) {
+    game.id = res._id
+  })
+  game = {}
   resetAll()
   playButton.show()
   title.show()
@@ -421,7 +441,7 @@ stage.whenReceiveMessage('screen9', function () {
   screenNumber = 9
   hideAll()
   table.show()
-  continueButton.show()
+  playAgainButton.show()
   let settings = {}
   let results = myResults()
   settings.switchChance = (Math.floor((results.switched_win_games / results.switched_games) * 10000) / 100) || 0
@@ -432,16 +452,16 @@ stage.whenReceiveMessage('screen9', function () {
 })
 
 // on start
-stage.whenFlag(function () {
-  api.newGame(false, function (res) {
-    game.id = res._id
-    stage.broadcastMessage('screen1')
-  })
+stage.whenLoaded(function () {
+  stage.broadcastMessage('screen1')
 })
 
 // events
 playButton.whenClicked(function () {
+  if (!canClick) { return null }
+  canClick = false
   stage.broadcastMessage('screen2')
+  canClick = true
 })
 
 nextButton.whenClicked(function () {
@@ -450,15 +470,27 @@ nextButton.whenClicked(function () {
 
 doors.forEach(function (item, i) {
   item.whenClicked(function () {
+    if (!canClick) { return null }
+    canClick = false
     game.choice = doors.indexOf(this)
     api.makeChoice(game.id, doors.indexOf(this), function (res) {
       game.eliminated = res.eliminated_door
       stage.broadcastMessage('screen4')
+      canClick = true
     })
   })
 })
 
+playAgainButton.whenClicked(function () {
+  if (!canClick) { return null }
+  canClick = false
+  stage.broadcastMessage('screen1')
+  canClick = true
+})
+
 continueButton.whenClicked(function () {
+  if (!canClick) { return null }
+  canClick = false
   if (screenNumber === 8) {
     stage.broadcastMessage('screen9')
   }
@@ -471,6 +503,7 @@ continueButton.whenClicked(function () {
   if (screenNumber === 4) {
     stage.broadcastMessage('screen5')
   }
+  canClick = true
 })
 
 function final (res) {
@@ -478,14 +511,20 @@ function final (res) {
   game.position_of_prize = res.position_of_prize
   stage.broadcastMessage('screen6')
   updateGames(game)
+  canClick = true
 }
+
 yes.whenClicked(function () {
+  if (!canClick) { return null }
+  canClick = false
   game.switched = true
   game.finalChoice = parseInt('012'.replace(game.choice + '', '').replace(game.eliminated + '', ''))
   api.changeChoice(game.finalChoice, game.id, final)
 })
 
 no.whenClicked(function () {
+  if (!canClick) { return null }
+  canClick = false
   game.switched = false
   game.finalChoice = game.choice
   api.changeChoice(game.finalChoice, game.id, final)
