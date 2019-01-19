@@ -52,9 +52,7 @@ function myResults () {
 let screenNumber = 0
 
 // stage
-let stage = new blockLike.Stage()
-
-stage.css('border', '10px solid black')
+let stage = new blockLike.Stage({ width: 800, height: 500 })
 
 // play button
 let playButton = new blockLike.Sprite({
@@ -74,7 +72,7 @@ playButton.hide()
 let title = new blockLike.Sprite({
   costume: new blockLike.Costume({
     width: stage.width,
-    height: 200
+    height: 150
   })
 })
 
@@ -92,10 +90,21 @@ let text = new blockLike.Sprite({
     height: stage.height
   })
 })
-text.changeY(-20)
+
 text.addClass('text')
 text.addTo(stage)
 text.hide()
+
+// intro text
+let introText = new blockLike.Sprite({
+  costume: new blockLike.Costume({
+    width: stage.width - 80,
+    height: stage.height
+  })
+})
+introText.addClass('intro-text')
+introText.addTo(stage)
+introText.hide()
 
 // next button
 let nextButton = new blockLike.Sprite({
@@ -122,21 +131,21 @@ continueButton.addClass('button')
 continueButton.addTo(stage)
 continueButton.inner(`Continue`)
 continueButton.hide()
-continueButton.goTo(0, -200)
+continueButton.goTo(0, -170)
 
 // play again
 let playAgainButton = new blockLike.Sprite({
   costume: new blockLike.Costume({
     color: '#FC6A21',
-    width: 300,
-    height: 180
+    width: 600,
+    height: 100
   })
 })
 playAgainButton.addClass('button')
 playAgainButton.addTo(stage)
 playAgainButton.inner(`Play Again`)
 playAgainButton.hide()
-playAgainButton.goTo(0, -150)
+playAgainButton.goTo(0, -170)
 
 // yes button (for switch)
 let yes = new blockLike.Sprite({
@@ -150,7 +159,7 @@ yes.addClass('button')
 yes.addTo(stage)
 yes.inner(`Yes`)
 yes.hide()
-yes.goTo(-150, -200)
+yes.goTo(-150, -170)
 
 // no button (for switch)
 let no = new blockLike.Sprite({
@@ -164,7 +173,7 @@ no.addClass('button')
 no.addTo(stage)
 no.inner(`No`)
 no.hide()
-no.goTo(150, -200)
+no.goTo(150, -170)
 
 // prize
 let prize = new blockLike.Sprite({
@@ -174,6 +183,7 @@ let prize = new blockLike.Sprite({
     height: 100
   })
 })
+prize.hide()
 prize.addTo(stage)
 stage.sendSpriteToFront(prize)
 
@@ -190,8 +200,8 @@ doors = doors.map(function (item, i) {
   let s = new blockLike.Sprite({
     costume: new blockLike.Costume({
       color: color,
-      width: 200,
-      height: 400,
+      width: 150,
+      height: 300,
       image: 'img/door.svg'
     })
   })
@@ -199,7 +209,8 @@ doors = doors.map(function (item, i) {
   s.addTo(stage)
   s.addClass('door')
   s.hide()
-  s.changeX((i - 1) * 250)
+  s.changeX((i - 1) * 200)
+  s.changeY(50)
 
   return s
 })
@@ -235,7 +246,7 @@ doorsSwitch = doors.map(function (item, i) {
   s.addClass('door')
   s.hide()
   s.changeX((i - 1) * 200)
-  s.changeY(25)
+  s.changeY(50)
 
   return s
 })
@@ -302,6 +313,7 @@ function updateTable (settings) {
 function resetAll () {
   resetDoorsSwitchCostume()
   text.inner('')
+  introText.inner('')
   stage.sprites.forEach(function (item) {
     item.hide()
   })
@@ -331,8 +343,8 @@ stage.whenReceiveMessage('screen2', function () {
   screenNumber = 2
   hideAll()
 
-  text.show()
-  text.inner(`Welcome to the Monty Hall Problem Experiment.</br>
+  introText.show()
+  introText.inner(`Welcome to the Monty Hall Problem Experiment.</br>
               On the next slide, you will be presented three doors.</br>
               Behind one of the doors, is a prize.</br>
               Guess where the prize is.</br>`)
@@ -388,7 +400,7 @@ stage.whenReceiveMessage('screen6', function () {
   }
 
   prize.show()
-  prize.goTo(doorsSwitch[game.position_of_prize].x, -75)
+  prize.goTo(doorsSwitch[game.position_of_prize].x, -(doorsSwitch[0].height / 2) + prize.height)
   showDoorsSwitch()
 })
 

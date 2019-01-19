@@ -1,3 +1,11 @@
+html, body {
+  overflow-y: hidden;
+}
+
+table{
+  font-size: 25px
+}
+
 .button{
   border: 5px solid black;
   text-align: center;
@@ -12,9 +20,10 @@
 .text{
   text-align: center;
   font-size: 20px;
-
 }
 
-table{
-  font-size: 25px
+.intro-text{
+  text-align: center;
+  font-size: 30px;
 }
+
