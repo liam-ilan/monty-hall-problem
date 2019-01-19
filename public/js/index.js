@@ -106,6 +106,22 @@ introText.addClass('intro-text')
 introText.addTo(stage)
 introText.hide()
 
+// statistics button
+let statisticsButton = new blockLike.Sprite({
+  costume: new blockLike.Costume({
+    color: '#FC6A21',
+    width: 300,
+    height: 150
+  })
+})
+
+statisticsButton.addClass('statsButton')
+statisticsButton.addTo(stage)
+statisticsButton.inner(`See The</br>
+                        Statistics`)
+statisticsButton.hide()
+statisticsButton.goTo(0, -170)
+
 // next button
 let nextButton = new blockLike.Sprite({
   costume: new blockLike.Costume({
@@ -345,9 +361,9 @@ stage.whenReceiveMessage('screen2', function () {
 
   introText.show()
   introText.inner(`Welcome to the Monty Hall Problem Experiment.</br>
-              On the next slide, you will be presented three doors.</br>
-              Behind one of the doors, is a prize.</br>
-              Guess where the prize is.</br>`)
+                  On the next slide, you will be presented three doors.</br>
+                  Behind one of the doors, is a prize.</br>
+                  Guess where the prize is.</br>`)
   nextButton.show()
 })
 
@@ -407,30 +423,31 @@ stage.whenReceiveMessage('screen6', function () {
 stage.whenReceiveMessage('screen7', function () {
   screenNumber = 7
   hideAll()
-  continueButton.show()
+  statisticsButton.show()
   text.show()
-  text.inner(`The Monty Hall Problem is a question in probability and
-                statistics. If you follow the process defined previously,
-                should you you change your choice of doors.
-                </br>
-                </br>
-                This might seem like a trivial question with a simple
-                answer. The two remaining doors have an equal
-                probability of having a prize behind them, therefore, your
-                final choice does not affect the probability of getting
-                the prize.
-                </br>
-                </br>
-                You will be surprised to hear that the woman with the
-                highest IQ on the planet disagreed to that simple 
-                solution. Marilyn Vos Savant, an editor for the parade
-                magazine, believed that it is beneficial to switch.
-                </br>
-                </br>
-                Surprisingly, Marilyn was proved correct through a simulation.
-                A true experiment, involving real people, was never done.
-                This website is built to run through the Monty Hall Problem
-                with real people, and to gather statistics about the problem.`)
+  text.inner(`The Monty Hall Problem is a statistics and probability problem.
+              The question is simple. You are in a game show. The game show host runs
+              you through the process of picking a door, and then switching 
+              your choice. Should you change you final choice of doors?
+              </br>
+              </br>
+              This might seem like a trivial question with a simple
+              answer. The two remaining doors have an equal
+              probability of having a prize behind them, therefore, your
+              final choice does not affect the probability of getting
+              the prize.
+              </br>
+              </br>
+              You will be surprised to hear that the woman with the
+              highest IQ on the planet disagreed to that simple 
+              solution. Marilyn Vos Savant, an editor for the parade
+              magazine, believed that it is beneficial to switch.
+              </br>
+              </br>
+              Surprisingly, Marilyn was proved correct through a simulation.
+              A true experiment, involving real people, was never done.
+              This website is built to run through the Monty Hall Problem
+              with real people, and to gather statistics about the problem.`)
 })
 
 stage.whenReceiveMessage('screen8', function () {
@@ -477,7 +494,10 @@ playButton.whenClicked(function () {
 })
 
 nextButton.whenClicked(function () {
+  if (!canClick) { return null }
+  canClick = false
   stage.broadcastMessage('screen3')
+  canClick = true
 })
 
 doors.forEach(function (item, i) {
@@ -493,6 +513,13 @@ doors.forEach(function (item, i) {
   })
 })
 
+statisticsButton.whenClicked(function () {
+  if (!canClick) { return null }
+  canClick = false
+  stage.broadcastMessage('screen8')
+  canClick = true
+})
+
 playAgainButton.whenClicked(function () {
   if (!canClick) { return null }
   canClick = false
@@ -505,9 +532,6 @@ continueButton.whenClicked(function () {
   canClick = false
   if (screenNumber === 8) {
     stage.broadcastMessage('screen9')
-  }
-  if (screenNumber === 7) {
-    stage.broadcastMessage('screen8')
   }
   if (screenNumber === 6) {
     stage.broadcastMessage('screen7')

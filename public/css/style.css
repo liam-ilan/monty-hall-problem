@@ -12,6 +12,12 @@ table{
   font-size: 70px
 }
 
+.statsButton{
+  border: 5px solid black;
+  text-align: center;
+  font-size: 50px
+}
+
 .title{
   text-align: center;
   font-size: 60px
