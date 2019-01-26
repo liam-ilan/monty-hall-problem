@@ -1,9 +1,15 @@
-html, body {
-  overflow-y: hidden;
-}
+
 
 table{
-  font-size: 25px
+  font-size: 36px;
+  width: 100%;
+  text-align: center;
+}
+
+th{
+  padding: 5px;
+  background-color: #ddd;
+  width: 33%;
 }
 
 .button{
@@ -25,11 +31,16 @@ table{
 
 .text{
   text-align: center;
-  font-size: 20px;
+  font-size: 48px;
+  padding: 30px;
 }
 
-.intro-text{
-  text-align: center;
-  font-size: 30px;
+.win{
+  font-size: 96px;
+  color: #00cc00;
 }
 
+.lose{
+  font-size: 96px;
+  color: #cc0000;
+}

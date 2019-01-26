@@ -52,7 +52,7 @@ function myResults () {
 let screenNumber = 0
 
 // stage
-let stage = new blockLike.Stage({ width: 800, height: 500 })
+let stage = new blockLike.Stage()
 
 // play button
 let playButton = new blockLike.Sprite({
@@ -63,6 +63,7 @@ let playButton = new blockLike.Sprite({
   })
 })
 
+playButton.goTo(0, -200)
 playButton.inner('Play')
 playButton.addClass('button')
 playButton.addTo(stage)
@@ -76,7 +77,7 @@ let title = new blockLike.Sprite({
   })
 })
 
-title.goTo(0, stage.height / 2 - title.height / 2 - 50)
+title.goTo(0, 200)
 title.inner(`The Monty Hall Problem</br>
               A Science Fair Experiment`)
 title.addClass('title')
@@ -87,22 +88,29 @@ title.hide()
 let text = new blockLike.Sprite({
   costume: new blockLike.Costume({
     width: stage.width - 80,
-    height: stage.height
+    height: 300
   })
 })
 
+text.goTo(0, 300)
 text.addClass('text')
 text.addTo(stage)
 text.hide()
 
+function resetClass () {
+  text.removeClass('win')
+  text.removeClass('lose')
+}
+
 // intro text
 let introText = new blockLike.Sprite({
   costume: new blockLike.Costume({
-    width: stage.width - 80,
-    height: stage.height
+    width: stage.width,
+    height: 150
   })
 })
-introText.addClass('intro-text')
+introText.goTo(0, 200)
+introText.addClass('text')
 introText.addTo(stage)
 introText.hide()
 
@@ -111,7 +119,7 @@ let statisticsButton = new blockLike.Sprite({
   costume: new blockLike.Costume({
     color: '#FC6A21',
     width: 300,
-    height: 150
+    height: 135
   })
 })
 
@@ -120,7 +128,7 @@ statisticsButton.addTo(stage)
 statisticsButton.inner(`See The</br>
                         Statistics`)
 statisticsButton.hide()
-statisticsButton.goTo(0, -170)
+statisticsButton.goTo(0, 0)
 
 // next button
 let nextButton = new blockLike.Sprite({
@@ -130,6 +138,8 @@ let nextButton = new blockLike.Sprite({
     height: 100
   })
 })
+
+nextButton.goTo(0, -200)
 nextButton.addClass('button')
 nextButton.addTo(stage)
 nextButton.inner(`Next`)
@@ -147,7 +157,7 @@ continueButton.addClass('button')
 continueButton.addTo(stage)
 continueButton.inner(`Continue`)
 continueButton.hide()
-continueButton.goTo(0, -170)
+continueButton.goTo(0, -200)
 
 // play again
 let playAgainButton = new blockLike.Sprite({
@@ -161,7 +171,7 @@ playAgainButton.addClass('button')
 playAgainButton.addTo(stage)
 playAgainButton.inner(`Play Again`)
 playAgainButton.hide()
-playAgainButton.goTo(0, -170)
+playAgainButton.goTo(0, -200)
 
 // yes button (for switch)
 let yes = new blockLike.Sprite({
@@ -175,7 +185,7 @@ yes.addClass('button')
 yes.addTo(stage)
 yes.inner(`Yes`)
 yes.hide()
-yes.goTo(-150, -170)
+yes.goTo(-150, -200)
 
 // no button (for switch)
 let no = new blockLike.Sprite({
@@ -189,7 +199,7 @@ no.addClass('button')
 no.addTo(stage)
 no.inner(`No`)
 no.hide()
-no.goTo(150, -170)
+no.goTo(150, -200)
 
 // prize
 let prize = new blockLike.Sprite({
@@ -207,7 +217,7 @@ stage.sendSpriteToFront(prize)
 let doors = new Array(3).fill(0)
 
 doors = doors.map(function (item, i) {
-  let color = new Array(3).fill('00')
+  let color = new Array(3).fill('cc')
   color[i] = 'fc'
   color = color.join('')
   color = color.toUpperCase()
@@ -242,7 +252,7 @@ function showDoors () {
 let doorsSwitch = new Array(3).fill(0)
 
 doorsSwitch = doors.map(function (item, i) {
-  let color = new Array(3).fill('00')
+  let color = new Array(3).fill('cc')
   color[i] = 'fc'
   color = color.join('')
   color = color.toUpperCase()
@@ -295,8 +305,8 @@ stage.sendSpriteToFront(prize)
 
 let table = new blockLike.Sprite({
   costume: new blockLike.Costume({
-    width: 600,
-    height: 200,
+    width: stage.width - 100,
+    height: stage.width/5,
     image: null
   })
 })
@@ -307,19 +317,19 @@ function updateTable (settings) {
   table.inner(`
     <table>
       <tr>
-        <td></td>
-        <td>Those Who Switched</td>
-        <td>Those Who Did Not Switch</td>
+        <th></th>
+        <th>Switched</th>
+        <th>Did Not Switch</th>
       </tr>
       <tr>
-        <td>Win Chance</td>
-        <td>${settings.switchChance}%</td>
-        <td>${settings.notSwitchChance}%</td>
-      </tr>
-      <tr>
-        <td>Amount of games</td>
+        <td>Games</td>
         <td>${settings.switchAmount}</td>
         <td>${settings.notSwitchAmount}</td>
+      </tr>
+      <tr>
+        <td>Win Precentage</td>
+        <td>${settings.switchChance}%</td>
+        <td>${settings.notSwitchChance}%</td>
       </tr>
     </table>
   `)
@@ -330,6 +340,7 @@ function resetAll () {
   resetDoorsSwitchCostume()
   text.inner('')
   introText.inner('')
+  resetClass()
   stage.sprites.forEach(function (item) {
     item.hide()
   })
@@ -347,12 +358,13 @@ function hideAll () {
 stage.whenReceiveMessage('screen1', function () {
   screenNumber = 1
   api.newGame(false, function (res) {
+    game = {}
     game.id = res._id
+
+    resetAll()
+    playButton.show()
+    title.show()
   })
-  game = {}
-  resetAll()
-  playButton.show()
-  title.show()
 })
 
 stage.whenReceiveMessage('screen2', function () {
@@ -360,10 +372,10 @@ stage.whenReceiveMessage('screen2', function () {
   hideAll()
 
   introText.show()
-  introText.inner(`Welcome to the Monty Hall Problem Experiment.</br>
-                  On the next slide, you will be presented three doors.</br>
-                  Behind one of the doors, is a prize.</br>
-                  Guess where the prize is.</br>`)
+  introText.inner(`Welcome to the Monty Hall Problem Experiment.
+                  On the next slide, you will be presented with three doors.
+                  Behind one of the doors, is a prize.
+                  Guess where the prize is.`)
   nextButton.show()
 })
 
@@ -383,7 +395,7 @@ stage.whenReceiveMessage('screen4', function () {
   showDoorsSwitch()
   setDoorsSwitchCostume(game.choice)
   text.show()
-  text.inner(`A check has been placed on the door you picked. </br>
+  text.inner(`A check has been placed on the door you picked.
               An X has been placed on the door where the prize is not located.`)
   continueButton.show()
 })
@@ -396,7 +408,7 @@ stage.whenReceiveMessage('screen5', function () {
   text.show()
   showDoorsSwitch()
 
-  text.inner(`You are now given the chance to change your choice to </br>
+  text.inner(`You are now given the chance to change your choice to
               the remaning, unmarked door. Would you like to switch?`)
 })
 
@@ -410,8 +422,10 @@ stage.whenReceiveMessage('screen6', function () {
   setDoorsSwitchCostume(game.finalChoice)
 
   if (game.win) {
+    text.addClass('win')
     text.inner('You Win')
   } else {
+    text.addClass('lose')
     text.inner('You Lose')
   }
 
@@ -423,38 +437,27 @@ stage.whenReceiveMessage('screen6', function () {
 stage.whenReceiveMessage('screen7', function () {
   screenNumber = 7
   hideAll()
-  statisticsButton.show()
+  resetClass()
+  table.show()
   text.show()
-  text.inner(`The Monty Hall Problem is a statistics and probability problem.
-              The question is simple. You are in a game show. The game show host runs
-              you through the process of picking a door, and then switching 
-              your choice. Should you change you final choice of doors?
-              </br>
-              </br>
-              This might seem like a trivial question with a simple
-              answer. The two remaining doors have an equal
-              probability of having a prize behind them, therefore, your
-              final choice does not affect the probability of getting
-              the prize.
-              </br>
-              </br>
-              You will be surprised to hear that the woman with the
-              highest IQ on the planet disagreed to that simple 
-              solution. Marilyn Vos Savant, an editor for the parade
-              magazine, believed that it is beneficial to switch.
-              </br>
-              </br>
-              Surprisingly, Marilyn was proved correct through a simulation.
-              A true experiment, involving real people, was never done.
-              This website is built to run through the Monty Hall Problem
-              with real people, and to gather statistics about the problem.`)
+  text.inner(`Your Results`)
+  continueButton.show()
+  let settings = {}
+  let results = myResults()
+  settings.switchChance = (Math.floor((results.switched_win_games / results.switched_games) * 10000) / 100) || 0
+  settings.switchAmount = results.switched_games
+  settings.notSwitchChance = (Math.floor((results.not_switched_win_games / results.not_switched_games) * 10000) / 100) || 0
+  settings.notSwitchAmount = results.not_switched_games
+  updateTable(settings)
 })
 
 stage.whenReceiveMessage('screen8', function () {
   screenNumber = 8
   hideAll()
   table.show()
-  continueButton.show()
+  text.show()
+  text.inner(`Global Results`)
+  playAgainButton.show()
   let settings = {}
   api.results(function (results) {
     console.log(results)
@@ -467,17 +470,7 @@ stage.whenReceiveMessage('screen8', function () {
 })
 
 stage.whenReceiveMessage('screen9', function () {
-  screenNumber = 9
-  hideAll()
-  table.show()
-  playAgainButton.show()
-  let settings = {}
-  let results = myResults()
-  settings.switchChance = (Math.floor((results.switched_win_games / results.switched_games) * 10000) / 100) || 0
-  settings.switchAmount = results.switched_games
-  settings.notSwitchChance = (Math.floor((results.not_switched_win_games / results.not_switched_games) * 10000) / 100) || 0
-  settings.notSwitchAmount = results.not_switched_games
-  updateTable(settings)
+
 })
 
 // on start
@@ -530,8 +523,9 @@ playAgainButton.whenClicked(function () {
 continueButton.whenClicked(function () {
   if (!canClick) { return null }
   canClick = false
-  if (screenNumber === 8) {
-    stage.broadcastMessage('screen9')
+
+  if (screenNumber === 7) {
+    stage.broadcastMessage('screen8')
   }
   if (screenNumber === 6) {
     stage.broadcastMessage('screen7')
