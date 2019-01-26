@@ -5,7 +5,7 @@ function runGame () {
   let game = {}
 
   // make a new game
-  api.newGame(true, function (id) {
+  api.newGame('bot', function (id) {
     // the game id
     game._id = id._id
 

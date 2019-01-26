@@ -69,8 +69,8 @@ app.post('/v1/game/new', function (req, res) {
   // this value is set to true when the game is finished
   game.completed = false
 
-  // is the game a bot (non-verifiable)
-  game.bot = req.body.bot
+  // what type of experiment this is (non-verifyable)
+  game.experiment = req.body.experiment
 
   db.collection('games').insertOne(game, function (err, result) {
     if (err) return res.json({ fail: 'database error' })
@@ -146,7 +146,7 @@ app.put('/v1/game/switch', function (req, res) {
 // get results
 app.get('/v1/game/results', function (req, res) {
   // queries
-  let botQuery = { bot: { $eq: false } }
+  let userQuery = { experiment: { $eq: 'user' } }
 
   let allGamesQuery = { completed: { $eq: true } }
 
@@ -160,23 +160,23 @@ app.get('/v1/game/results', function (req, res) {
   let numbers = {}
 
   // welcome to callback hell
-  db.collection('games').countDocuments({ $and: [allGamesQuery, botQuery] }, function (err, allGames) {
+  db.collection('games').countDocuments({ $and: [allGamesQuery, userQuery] }, function (err, allGames) {
     if (err) return res.json({ fail: 'database error' })
     numbers.all_games = allGames
 
-    db.collection('games').countDocuments({ $and: [switchedGamesQuery, botQuery] }, function (err, switchedGames) {
+    db.collection('games').countDocuments({ $and: [switchedGamesQuery, userQuery] }, function (err, switchedGames) {
       if (err) return res.json({ fail: 'database error' })
       numbers.switched_games = switchedGames
 
-      db.collection('games').countDocuments({ $and: [switchedWinGamesQuery, botQuery] }, function (err, switchedWinGames) {
+      db.collection('games').countDocuments({ $and: [switchedWinGamesQuery, userQuery] }, function (err, switchedWinGames) {
         if (err) return res.json({ fail: 'database error' })
         numbers.switched_win_games = switchedWinGames
 
-        db.collection('games').countDocuments({ $and: [notSwitchedGamesQuery, botQuery] }, function (err, notSwitchedGames) {
+        db.collection('games').countDocuments({ $and: [notSwitchedGamesQuery, userQuery] }, function (err, notSwitchedGames) {
           if (err) return res.json({ fail: 'database error' })
           numbers.not_switched_games = notSwitchedGames
 
-          db.collection('games').countDocuments({ $and: [notSwitchedWinGamesQuery, botQuery] }, function (err, notSwitchedWinGames) {
+          db.collection('games').countDocuments({ $and: [notSwitchedWinGamesQuery, userQuery] }, function (err, notSwitchedWinGames) {
             if (err) return res.json({ fail: 'database error' })
             numbers.not_switched_win_games = notSwitchedWinGames
 

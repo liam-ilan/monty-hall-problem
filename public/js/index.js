@@ -357,7 +357,7 @@ function hideAll () {
 
 stage.whenReceiveMessage('screen1', function () {
   screenNumber = 1
-  api.newGame(false, function (res) {
+  api.newGame('user', function (res) {
     game = {}
     game.id = res._id
 

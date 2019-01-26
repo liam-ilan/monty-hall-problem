@@ -27,8 +27,8 @@ api.reqJson = async function (url, method = 'GET', data = null) {
 // posts game to server
 // runs callback and passes _id
 
-api.newGame = async function (isBot, cb) {
-  const _id = await api.reqJson('/v1/game/new', 'post', { bot: isBot })
+api.newGame = async function (experiment, cb) {
+  const _id = await api.reqJson('/v1/game/new', 'post', { experiment: experiment })
 
   // cb
   return cb ? cb(_id) : null
