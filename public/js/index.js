@@ -306,7 +306,7 @@ stage.sendSpriteToFront(prize)
 let table = new blockLike.Sprite({
   costume: new blockLike.Costume({
     width: stage.width - 100,
-    height: stage.width/5,
+    height: stage.width / 5,
     image: null
   })
 })
@@ -459,8 +459,7 @@ stage.whenReceiveMessage('screen8', function () {
   text.inner(`Global Results`)
   playAgainButton.show()
   let settings = {}
-  api.results(function (results) {
-    console.log(results)
+  api.results('user', function (results) {
     settings.switchChance = (Math.floor((results.switched_win_games / results.switched_games) * 10000) / 100) || 0
     settings.switchAmount = results.switched_games
     settings.notSwitchChance = (Math.floor((results.not_switched_win_games / results.not_switched_games) * 10000) / 100) || 0

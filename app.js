@@ -144,9 +144,13 @@ app.put('/v1/game/switch', function (req, res) {
 })
 
 // get results
-app.get('/v1/game/results', function (req, res) {
+app.post('/v1/game/results', function (req, res) {
+  let findType = 'user'
+  if (req.body.experiment === 'bot') {
+    findType = 'bot'
+  }
   // queries
-  let userQuery = { experiment: { $eq: 'user' } }
+  let userQuery = { experiment: { $eq: findType } }
 
   let allGamesQuery = { completed: { $eq: true } }
 
