@@ -1,11 +1,11 @@
 /* global api */
 
-function runGame () {
+function runGame (experiment) {
   // the game data we collect
   let game = {}
 
   // make a new game
-  api.newGame('bot', function (id) {
+  api.newGame(experiment, function (id) {
     // the game id
     game._id = id._id
 
@@ -38,8 +38,8 @@ function runGame () {
   })
 }
 
-function loopGames (amount) {
-  for (let i = 0; i < amount; i++) {
-    runGame()
+function loopGames (count, experiment = 'bot') {
+  for (let i = 0; i < count; i++) {
+    runGame(experiment)
   };
 }
