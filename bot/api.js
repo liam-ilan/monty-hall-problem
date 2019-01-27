@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const fetch = require('node-fetch')
 // allow us to use our .env file
 require('dotenv').config()
 
@@ -88,4 +88,4 @@ api.results = async function (type, cb) {
   return cb ? cb(results) : null
 }
 
-module.exports = api;
+module.exports = api

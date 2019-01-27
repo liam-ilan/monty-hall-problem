@@ -1,6 +1,6 @@
 const api = require('./api')
 
-function jsonToCsv(obj){
+function jsonToCsv (obj) {
   return Object.values(obj).toString()
 }
 
@@ -35,7 +35,7 @@ function runGame (experiment, cb) {
         game.posOfPrize = res.position_of_prize
         game.win = res.win
 
-        cb();
+        cb()
       })
     })
   })
@@ -44,12 +44,12 @@ function runGame (experiment, cb) {
 function makeBatch (count, cb) {
   const experiment = `batch-${Date.now()}`
 
-  let toDo = count;
+  let toDo = count
   for (let i = 0; i < count; i++) {
-    runGame(experiment, function(){
-      toDo -= 1;
-      if(!toDo) {
-        api.results(experiment, function(r){
+    runGame(experiment, function () {
+      toDo -= 1
+      if (!toDo) {
+        api.results(experiment, function (r) {
           console.log(`${experiment},${jsonToCsv(r)}`)
           cb()
         })
@@ -60,9 +60,9 @@ function makeBatch (count, cb) {
 
 function makeSimulation (batchCount, count) {
   let toDo = batchCount
-  function callback(){
+  function callback () {
     toDo -= 1
-    if(toDo){
+    if (toDo) {
       makeBatch(count, callback)
     }
   }
@@ -73,4 +73,4 @@ const batchCount = process.argv[2]
 const count = process.argv[3]
 
 console.log('experiment,number_of_games,not_switched_games,not_switched_win_games,switched_games,switched_win_games')
-makeSimulation (batchCount, count)
+makeSimulation(batchCount, count)
