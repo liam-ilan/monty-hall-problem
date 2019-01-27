@@ -72,5 +72,5 @@ function makeSimulation (batchCount, count) {
 const batchCount = process.argv[2]
 const count = process.argv[3]
 
-console.log('experiment,number_of_games,not_switched_games,not_switched_win_games,switched_games,switched_win_games')
+console.log('experiment,number_of_games,switched_games,switched_win_games,not_switched_games,not_switched_win_games')
 makeSimulation(batchCount, count)
