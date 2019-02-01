@@ -112,7 +112,7 @@ app.put('/v1/game/choice', function (req, res) {
 
 // change your choice
 app.put('/v1/game/switch', function (req, res) {
-  // a mock of finding the game in the db
+
   db.collection('games').findOne({ '_id': ObjectId(req.body._id) }, function (err, game) {
     if (err) return res.json({ fail: 'database error' })
 
@@ -135,7 +135,7 @@ app.put('/v1/game/switch', function (req, res) {
     game.completed = true
 
     delete game._id
-    // a mock of finding the game in the database, and THEN replacing it with our new game
+
     db.collection('games').findOneAndUpdate({ '_id': ObjectId(req.body._id) }, { $set: game }, { returnOriginal: false }, function (err, result) {
       if (err) return res.json({ fail: 'database error' })
       res.json({ position_of_prize: result.value.position_of_prize, win: result.value.win })

@@ -51,8 +51,26 @@ function myResults () {
 // screen number
 let screenNumber = 0
 
-// stage
-let stage = new blockLike.Stage()
+// The stage is vertical and defualts to common 980 width on phones
+// for anything not a vertical phone (mainly PC) we hack...
+if (window.innerHeight < 1743 && window.innerHeight < window.innerWidth) {
+  // set a fixed stage size
+  stage = new blockLike.Stage({ width: 980, height: 1743});
+  // zoom out (scale down)
+  stage.ratio = window.innerHeight / 1743;
+  stage.css({ transformOrigin: 'top' });
+  stage.zoom(stage.ratio * 100);
+
+  // disable user scolling
+  window.addEventListener('mousewheel', (e) => {
+    e.preventDefault();
+  });
+  window.onkeydown = function (e) {
+    return !(e.keyCode === 32);
+  };
+} else {
+  stage = new blockLike.Stage();
+}
 
 // play button
 let playButton = new blockLike.Sprite({
