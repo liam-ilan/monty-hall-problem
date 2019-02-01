@@ -112,7 +112,6 @@ app.put('/v1/game/choice', function (req, res) {
 
 // change your choice
 app.put('/v1/game/switch', function (req, res) {
-
   db.collection('games').findOne({ '_id': ObjectId(req.body._id) }, function (err, game) {
     if (err) return res.json({ fail: 'database error' })
 

@@ -51,25 +51,26 @@ function myResults () {
 // screen number
 let screenNumber = 0
 
+let stage
 // The stage is vertical and defualts to common 980 width on phones
 // for anything not a vertical phone (mainly PC) we hack...
 if (window.innerHeight < 1743 && window.innerHeight < window.innerWidth) {
   // set a fixed stage size
-  stage = new blockLike.Stage({ width: 980, height: 1743});
+  stage = new blockLike.Stage({ width: 980, height: 1743 })
   // zoom out (scale down)
-  stage.ratio = window.innerHeight / 1743;
-  stage.css({ transformOrigin: 'top' });
-  stage.zoom(stage.ratio * 100);
+  stage.ratio = window.innerHeight / 1743
+  stage.css({ transformOrigin: 'top' })
+  stage.zoom(stage.ratio * 100)
 
   // disable user scolling
   window.addEventListener('mousewheel', (e) => {
-    e.preventDefault();
-  });
+    e.preventDefault()
+  })
   window.onkeydown = function (e) {
-    return !(e.keyCode === 32);
-  };
+    return !(e.keyCode === 32)
+  }
 } else {
-  stage = new blockLike.Stage();
+  stage = new blockLike.Stage()
 }
 
 // play button
@@ -311,12 +312,14 @@ function resetDoorsSwitchCostume () {
 }
 
 // set door costumes (for switched screen)
-function setDoorsSwitchCostume (choice) {
-  doorsSwitch[game.eliminated].costume.image = 'img/eliminated.svg'
-  doorsSwitch[game.eliminated].refresh()
-
+function setDoorsSwitchCostumeChoice (choice) {
   doorsSwitch[choice].costume.image = 'img/your_choice.svg'
   doorsSwitch[choice].refresh()
+}
+
+function setDoorsSwitchCostumeEliminated () {
+  doorsSwitch[game.eliminated].costume.image = 'img/eliminated.svg'
+  doorsSwitch[game.eliminated].refresh()
 }
 
 stage.sendSpriteToFront(prize)
@@ -411,7 +414,9 @@ stage.whenReceiveMessage('screen4', function () {
   hideAll()
 
   showDoorsSwitch()
-  setDoorsSwitchCostume(game.choice)
+  setDoorsSwitchCostumeChoice(game.choice)
+  stage.wait(1)
+  setDoorsSwitchCostumeEliminated()
   text.show()
   text.inner(`A check has been placed on the door you picked.
               An X has been placed on the door where the prize is not located.`)
@@ -433,11 +438,14 @@ stage.whenReceiveMessage('screen5', function () {
 stage.whenReceiveMessage('screen6', function () {
   screenNumber = 6
   hideAll()
+  resetDoorsSwitchCostume()
+  showDoorsSwitch()
+
+  setDoorsSwitchCostumeEliminated()
+  setDoorsSwitchCostumeChoice(game.finalChoice)
+  stage.wait(1)
   text.show()
   continueButton.show()
-  resetDoorsSwitchCostume()
-
-  setDoorsSwitchCostume(game.finalChoice)
 
   if (game.win) {
     text.addClass('win')
@@ -449,7 +457,6 @@ stage.whenReceiveMessage('screen6', function () {
 
   prize.show()
   prize.goTo(doorsSwitch[game.position_of_prize].x, -(doorsSwitch[0].height / 2) + prize.height)
-  showDoorsSwitch()
 })
 
 stage.whenReceiveMessage('screen7', function () {
