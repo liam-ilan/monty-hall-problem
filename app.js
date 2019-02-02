@@ -39,8 +39,11 @@ MongoClient.connect(mongoURI, mongoOptions, (err, client) => {
   // if there is an error, log it
   if (err) return console.log({ fail: 'database error' })
 
+  // the name of the DB
+  const dbName = mongoURI.substr(mongoURI.lastIndexOf('/') + 1)
+
   // set the DB
-  db = client.db('heroku_qrw26v0v')
+  db = client.db(dbName)
 
   // listen on the port
   app.listen(port, () => console.log(`Example app listening on port ${port}!`))
